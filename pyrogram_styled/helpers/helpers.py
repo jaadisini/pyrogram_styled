@@ -48,7 +48,7 @@ def ntb(button):
     return button
     # return {'text': text, type: value}
 
-
+"""
 def ikb(rows=None):
     if rows is None:
         rows = []
@@ -80,6 +80,88 @@ def btn(text, value, type="callback_data", style=None):
     if style is not None:
         kwargs["style"] = style
     return InlineKeyboardButton(text, **kwargs)
+"""
+
+def ikb(rows=None):
+    if rows is None:
+        rows = []
+
+    lines = []
+
+    for row in rows:
+        line = []
+
+        for button in row:
+            if isinstance(button, str):
+                button = btn(button, button)
+
+            elif len(button) == 4:
+                text, value, third, fourth = button
+
+                # Legacy format:
+                # (text, callback_data, ButtonStyle, emoji_id)
+                if isinstance(third, ButtonStyle):
+                    button = btn(
+                        text=text,
+                        value=value,
+                        type="callback_data",
+                        style=third,
+                        icon_custom_emoji_id=fourth,
+                    )
+                else:
+                    # New format:
+                    # (text, value, type, style)
+                    button = btn(text, value, third, fourth)
+
+            elif len(button) == 3:
+                text, value, third = button
+
+                # (text, callback_data, ButtonStyle)
+                if isinstance(third, ButtonStyle):
+                    button = btn(
+                        text=text,
+                        value=value,
+                        type="callback_data",
+                        style=third,
+                    )
+                else:
+                    button = btn(text, value, third)
+
+            else:
+                button = btn(*button)
+
+            line.append(button)
+
+        lines.append(line)
+
+    return InlineKeyboardMarkup(inline_keyboard=lines)
+
+
+def btn(
+    text,
+    value,
+    type="callback_data",
+    style=None,
+    icon_custom_emoji_id=None,
+):
+    if not isinstance(type, str):
+        raise TypeError(
+            f"Parameter 'type' harus string, got {type.__class__.__name__}"
+        )
+
+    if type == "callback_data" and not isinstance(value, bytes):
+        value = str(value).encode()
+
+    kwargs = {type: value}
+
+    if style is not None:
+        kwargs["style"] = style
+
+    if icon_custom_emoji_id is not None:
+        kwargs["icon_custom_emoji_id"] = str(icon_custom_emoji_id)
+
+    return InlineKeyboardButton(text, **kwargs)
+
 
 def kb(rows=None, **kwargs):
 
