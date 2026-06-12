@@ -6,6 +6,8 @@ from pyrogram_styled.types import (
     ForceReply,
 )
 
+from pyrogram_styled.enums import ButtonStyle
+
 # The inverse of above
 def bki(keyboard):
     """
